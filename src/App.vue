@@ -1,14 +1,16 @@
 <template>
   <v-app>
     <header>
-      <h2 class="text-center green white--text">CRUD Vuejs | Actividad I</h2>
+      <h2 class="text-center green white--text pa-1">
+        CRUD Vuejs | Actividad I
+      </h2>
     </header>
     <v-container>
       <v-row class="flex align-center justify-space-between my-5">
         <v-col class="justify-end" cols="12 text-center" sm="4">
           <h3>
             Total Construcciones:
-            <span class="count">{{construcciones.length}}</span>
+            <span class="count">{{ construcciones.length }}</span>
           </h3>
         </v-col>
         <v-col class="justify-start" cols="12 text-center" sm="4">
@@ -65,9 +67,14 @@
                     >
                       <v-icon dark> mdi-minus </v-icon>
                     </v-btn>
-                    <v-btn 
-                    @click="abrirModalEditar(construccion)"
-                    class="mx-2" fab dark small color="teal">
+                    <v-btn
+                      @click="abrirModalEditar(construccion)"
+                      class="mx-2"
+                      fab
+                      dark
+                      small
+                      color="teal"
+                    >
                       <v-icon dark> mdi-pencil </v-icon>
                     </v-btn>
                   </td>
@@ -88,7 +95,7 @@
       <v-dialog v-model="modalConstruccion" persistent max-width="550px">
         <v-card>
           <v-card-title>
-            <span class="headline">Datos de la construcción</span>
+            <span class="headline">{{ tituloModal }}</span>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -152,7 +159,7 @@
               Cerrar
             </v-btn>
             <v-btn color="blue darken-1" text @click="enviarDatos">
-              {{textDinamicoBoton}}
+              {{ textDinamicoBoton }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -170,11 +177,11 @@ import { url } from "@/constante.js";
   [X] *Agregar funcionalidad para crear una construccion
   [X] *Agregar Sweet alert con toast
   [X] *Validar los campo (muestre alerta que todos son requeridos)
-  [] *Agregar funcionalidad para editar una constrccuin
-  [] *binding con el autocomplete que se llene los campos al editar
-  [] *Completar CRUD agregando sweetalert & tost mensajes
+  [X] *Agregar funcionalidad para editar una constrccuin
+  [X] *binding con el autocomplete que se llene los campos al editar
+  [X] *Completar CRUD agregando sweetalert & tost mensajes
+  [X] *render condicional en botones y templte
   [] *Corregir error relacionados a ortiifgrafia consola etc, 
-  [] *render condicional en botones y templte
 
 */
 export default {
@@ -194,10 +201,15 @@ export default {
   mounted() {
     this.obtenerConstrucciones();
   },
-  computed:{
-    textDinamicoBoton(){
-      return this.construccion._id ? 'Editar' : 'Crear'
-    }
+  computed: {
+    textDinamicoBoton() {
+      return this.construccion._id ? "Editar" : "Crear";
+    },
+    tituloModal() {
+      return this.construccion._id
+        ? "Datos de la construcción en edición"
+        : "Datos de la nueva construcción";
+    },
   },
   methods: {
     obtenerConstrucciones() {
@@ -211,7 +223,7 @@ export default {
           }
         })
         .catch((e) => {
-          console.error(e.message);
+          this.mostrarAlerta(e.message, "error");
         });
     },
     mostrarAlerta(title, icon) {
@@ -239,14 +251,14 @@ export default {
       this.modalConstruccion = false;
     },
     comprobarDatos({ nombre, ancho, alto, materiales }) {
-      return !nombre || !ancho || !alto || !materiales ? false : true;
+      return !nombre || !ancho || !alto || !materiales.length ? false : true;
     },
     abrirModalCrear() {
       this.esCrear = true;
       this.modalConstruccion = true;
     },
-    abrirModalEditar(datos){
-      this.construccion = { ...datos};
+    abrirModalEditar(datos) {
+      this.construccion = { ...datos };
       this.esCrear = false;
       this.modalConstruccion = true;
     },
@@ -268,31 +280,45 @@ export default {
           this.mostrarAlerta(e.message, "error");
         });
     },
-    editarConstruccion({nombre, ancho, alto, materiales, _id}){
-      this.axios.put(`${url}/actualizar/${_id}`, {nombre, ancho, alto, materiales})
-        .then(response=>{
-          if(response.status === 200){
+    editarConstruccion({ nombre, ancho, alto, materiales, _id }) {
+      this.axios
+        .put(`${url}/actualizar/${_id}`, { nombre, ancho, alto, materiales })
+        .then((response) => {
+          if (response.status === 200) {
             this.mostrarAlerta(response.data.mensaje, "success");
             this.obtenerConstrucciones();
             this.establecerDatos();
           }
         })
-        .catch(e=>{
+        .catch((e) => {
           this.mostrarAlerta(e.message, "error");
-        })
+        });
     },
     eliminarConstruccion(idConstruccion) {
-      this.axios
-        .delete(`${url}/eliminar/${idConstruccion}`)
-        .then((response) => {
-          if (response.status === 200) {
-            this.mostrarAlerta(response.data.mensaje, "success");
-            this.obtenerConstrucciones()
-          }
-        })
-        .catch((e) => {
-          this.mostrarAlerta(e.message, "errror");
-        });
+      Swal.fire({
+        title: "¿Quieres eliminar esta edificación?",
+        text: "Una vez eliminada, no podras recuperas los datos",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4caf50",
+        cancelButtonColor: "#2778c4",
+        cancelButtonText: "Cancelar",
+        confirmButtonText: "Eliminar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.axios
+            .delete(`${url}/eliminar/${idConstruccion}`)
+            .then((response) => {
+              if (response.status === 200) {
+                this.mostrarAlerta(response.data.mensaje, "success");
+                this.obtenerConstrucciones();
+              }
+            })
+            .catch((e) => {
+              this.mostrarAlerta(e.message, "errror");
+            });
+        }
+      });
     },
     establecerDatos() {
       this.construccion = {
