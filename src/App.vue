@@ -24,100 +24,56 @@
       </v-row>
     </v-container>
     <v-container>
-      <template>
-        <v-simple-table>
-          <template v-slot:default>
-            <thead>
-              <tr class="green text-uppercase">
-                <th class="white--text text-left">ID</th>
-                <th class="white--text text-left">Nombre</th>
-                <th class="white--text text-left">Ancho</th>
-                <th class="white--text text-left">Alto</th>
-                <th class="white--text text-left">Materiales</th>
-                <th class="white--text text-left">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Ejemplo</td>
-                <td>20</td>
-                <td>30</td>
-                <td>Nose, ejemplo, otro</td>
-                <td>
-                  <v-btn class="mx-2" fab dark small color="error">
-                    <v-icon dark> mdi-minus </v-icon>
-                  </v-btn>
-                  <v-btn class="mx-2" fab dark small color="teal">
-                    <v-icon dark> mdi-pencil </v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>Ejemplo</td>
-                <td>20</td>
-                <td>30</td>
-                <td>Nose, ejemplo, otro</td>
-                <td>
-                  <v-btn class="mx-2" fab dark small color="error">
-                    <v-icon dark> mdi-minus </v-icon>
-                  </v-btn>
-                  <v-btn class="mx-2" fab dark small color="teal">
-                    <v-icon dark> mdi-pencil </v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>Ejemplo</td>
-                <td>20</td>
-                <td>30</td>
-                <td>Nose, ejemplo, otro</td>
-                <td>
-                  <v-btn class="mx-2" fab dark small color="error">
-                    <v-icon dark> mdi-minus </v-icon>
-                  </v-btn>
-                  <v-btn class="mx-2" fab dark small color="teal">
-                    <v-icon dark> mdi-pencil </v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>Ejemplo</td>
-                <td>20</td>
-                <td>30</td>
-                <td>Nose, ejemplo, otro</td>
-                <td>
-                  <v-btn class="mx-2" fab dark small color="error">
-                    <v-icon dark> mdi-minus </v-icon>
-                  </v-btn>
-                  <v-btn class="mx-2" fab dark small color="teal">
-                    <v-icon dark> mdi-pencil </v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>Ejemplo</td>
-                <td>20</td>
-                <td>30</td>
-                <td>Nose, ejemplo, otro</td>
-                <td>
-                  <v-btn class="mx-2" fab dark small color="error">
-                    <v-icon dark> mdi-minus </v-icon>
-                  </v-btn>
-                  <v-btn class="mx-2" fab dark small color="teal">
-                    <v-icon dark> mdi-pencil </v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </template></v-container
-    >
+      <div v-if="construcciones.length > 0">
+        <template>
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr class="green text-uppercase">
+                  <th class="white--text text-left">ID</th>
+                  <th class="white--text text-left">Tipo</th>
+                  <th class="white--text text-left">Ancho</th>
+                  <th class="white--text text-left">Alto</th>
+                  <th class="white--text text-left">Materiales</th>
+                  <th class="white--text text-left">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="construccion in construcciones"
+                  :key="construccion._id"
+                >
+                  <td>{{ construccion._id.substring(1,9) }}...</td>
+                  <td>{{ construccion.nombre }}</td>
+                  <td>{{ construccion.ancho }}</td>
+                  <td>{{ construccion.alto }}</td>
+                  <td>
+                    <span
+                      v-for="(material, index) in construccion.materiales"
+                      :key="`material-${index}`"
+                      >{{ index > 0 ? ", " : "" }}{{ material }}</span
+                    >
+                  </td>
+                  <td>
+                    <v-btn class="mx-2" fab dark small color="error">
+                      <v-icon dark> mdi-minus </v-icon>
+                    </v-btn>
+                    <v-btn class="mx-2" fab dark small color="teal">
+                      <v-icon dark> mdi-pencil </v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </template>
+      </div>
+      <div v-else class="container">
+        <v-container>
+          <p class="text-center">NO hay edificaciones registradas</p>
+        </v-container>
+      </div>
+    </v-container>
 
     <v-row justify="center">
       <v-dialog v-model="modalConstruccion" persistent max-width="550px">
@@ -130,7 +86,7 @@
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-                    :rules="rules"
+                    :rules="validacionCampos"
                     v-model="construccion.nombre"
                     label="Tipo de construcción*"
                     required
@@ -138,18 +94,20 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-                    :rules="rules"
+                    :rules="validacionCampos"
                     v-model="construccion.alto"
                     label="Indique el ancho*"
+                    min="0"
                     type="number"
                     hint="el valor expresado sera en metros (m)"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-                    :rules="rules"
+                    :rules="validacionCampos"
                     v-model="construccion.ancho"
                     label="Indique el alto*"
+                    min="0"
                     type="number"
                     hint="el valor expresado sera en metros (m)"
                     required
@@ -157,7 +115,6 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-autocomplete
-                    :rules="rules"
                     v-model="construccion.materiales"
                     :items="[
                       'Cemento',
@@ -182,14 +139,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="
-                modalConstruccion = false;
-                construccion.materiales = [];
-              "
-            >
+            <v-btn color="blue darken-1" text @click="cerrarModal">
               Cerrar
             </v-btn>
             <v-btn color="blue darken-1" text @click="enviarDatos">
@@ -199,23 +149,23 @@
         </v-card>
       </v-dialog>
     </v-row>
-    {{ construccion.materiales }}
   </v-app>
 </template>
  
 
 <script>
 import Swal from "sweetalert2";
+import { url } from "@/constante.js";
 /* 
   Todo:
-  [] *Agregar funcionalidad para crear una construccion
+  [X] *Agregar funcionalidad para crear una construccion
+  [X] *Agregar Sweet alert con toast
+  [X] *Validar los campo (muestre alerta que todos son requeridos)
   [] *Agregar funcionalidad para editar una constrccuin
-  [] *Validar los campo (muestre alerta que todos son requeridos)
   [] *binding con el autocomplete que se llene los campos al editar
   [] *Completar CRUD agregando sweetalert & tost mensajes
   [] *Corregir error relacionados a ortiifgrafia consola etc, 
   [] *render condicional en botones y templte
-  [] *Agregar Sweet alert con toast
 
 */
 export default {
@@ -229,26 +179,46 @@ export default {
       alto: "",
       materiales: [],
     },
-    rules: [(value) => !!value || "Debes completar este campo."],
+    construcciones: [],
+    validacionCampos: [(valor) => !!valor || "Debes completar este campo."],
   }),
+  mounted() {
+    this.axios
+      .get(`${url}/obtener`)
+      .then(({ data }) => {
+        if (data.length > 0) {
+          this.construcciones = data;
+        } else {
+          this.construcciones = [];
+        }
+      })
+      .catch((e) => {
+        console.error(e.message);
+      });
+  },
   methods: {
+    mostrarAlerta(title, icon) {
+      const alerta = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+
+      return alerta.fire({
+        icon,
+        title,
+      });
+    },
     enviarDatos() {
       const esValido = this.comprobarDatos(this.construccion);
       if (!esValido) {
-        const alertaError = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-        });
-
-        return alertaError.fire({
-          icon: "error",
-          title: "Completa todos los campos.",
-        });
+        return this.mostrarAlerta("Completa todos los campos", "error");
       }
-      console.log(this.construccion)
+      this.esCrear
+        ? this.crearConstruccion(this.construccion)
+        : this.editarConstruccion(this.construcciones);
       this.modalConstruccion = false;
     },
     comprobarDatos({ nombre, ancho, alto, materiales }) {
@@ -257,6 +227,32 @@ export default {
     abrirModalCrear() {
       this.esCrear = true;
       this.modalConstruccion = true;
+    },
+    cerrarModal() {
+      this.modalConstruccion = false;
+      this.establecerDatos();
+    },
+    crearConstruccion({ nombre, ancho, alto, materiales }) {
+      this.axios
+        .post(`${url}/agregar`, { nombre, ancho, alto, materiales })
+        .then(({ data: { mensaje }, status }) => {
+          if (status === 201) {
+            this.mostrarAlerta(mensaje, "success");
+            this.establecerDatos();
+          }
+        })
+        .catch((e) => {
+          this.mostrarAlerta(e.message, "error");
+        });
+    },
+    establecerDatos() {
+      this.construccion = {
+        nombre: "",
+        ancho: "",
+        alto: "",
+        materiales: [],
+      };
+      this.esCrear = false;
     },
   },
 };
