@@ -12,21 +12,202 @@
           </h3>
         </v-col>
         <v-col class="justify-start" cols="12 text-center" sm="4">
-          <v-btn color="green ligth white--text" elevation="2" fab>
+          <v-btn
+            @click="dialog = true"
+            color="green ligth white--text"
+            elevation="2"
+            fab
+          >
             <v-icon dark x-large> mdi-plus-circle </v-icon>
           </v-btn>
         </v-col>
       </v-row>
     </v-container>
+    <v-container>
+      <template>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr class="green text-uppercase">
+                <th class="white--text text-left">ID</th>
+                <th class="white--text text-left">Nombre</th>
+                <th class="white--text text-left">Ancho</th>
+                <th class="white--text text-left">Alto</th>
+                <th class="white--text text-left">Materiales</th>
+                <th class="white--text text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Ejemplo</td>
+                <td>20</td>
+                <td>30</td>
+                <td>Nose, ejemplo, otro</td>
+                <td>
+                  <v-btn class="mx-2" fab dark small color="error">
+                    <v-icon dark> mdi-minus </v-icon>
+                  </v-btn>
+                  <v-btn class="mx-2" fab dark small color="teal">
+                    <v-icon dark> mdi-pencil </v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Ejemplo</td>
+                <td>20</td>
+                <td>30</td>
+                <td>Nose, ejemplo, otro</td>
+                <td>
+                  <v-btn class="mx-2" fab dark small color="error">
+                    <v-icon dark> mdi-minus </v-icon>
+                  </v-btn>
+                  <v-btn class="mx-2" fab dark small color="teal">
+                    <v-icon dark> mdi-pencil </v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Ejemplo</td>
+                <td>20</td>
+                <td>30</td>
+                <td>Nose, ejemplo, otro</td>
+                <td>
+                  <v-btn class="mx-2" fab dark small color="error">
+                    <v-icon dark> mdi-minus </v-icon>
+                  </v-btn>
+                  <v-btn class="mx-2" fab dark small color="teal">
+                    <v-icon dark> mdi-pencil </v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Ejemplo</td>
+                <td>20</td>
+                <td>30</td>
+                <td>Nose, ejemplo, otro</td>
+                <td>
+                  <v-btn class="mx-2" fab dark small color="error">
+                    <v-icon dark> mdi-minus </v-icon>
+                  </v-btn>
+                  <v-btn class="mx-2" fab dark small color="teal">
+                    <v-icon dark> mdi-pencil </v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Ejemplo</td>
+                <td>20</td>
+                <td>30</td>
+                <td>Nose, ejemplo, otro</td>
+                <td>
+                  <v-btn class="mx-2" fab dark small color="error">
+                    <v-icon dark> mdi-minus </v-icon>
+                  </v-btn>
+                  <v-btn class="mx-2" fab dark small color="teal">
+                    <v-icon dark> mdi-pencil </v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </template></v-container
+    >
+
+    <v-row justify="center">
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Datos de la construcción</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="construccion.nombre"
+                    label="Legal first name*"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="construccion.alto"
+                    label="Legal middle name"
+                    hint="example of helper text only on focus"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="construccion.ancho"
+                    label="Legal last name*"
+                    hint="example of persistent helper text"
+                    persistent-hint
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-autocomplete
+                    v-model="construccion.materiales"
+                    :items="[
+                      'Skiing',
+                      'Ice hockey',
+                      'Soccer',
+                      'Basketball',
+                      'Hockey',
+                      'Reading',
+                      'Writing',
+                      'Coding',
+                      'Basejump',
+                    ]"
+                    label="Interests"
+                    multiple
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>Todos los campos son obligatorios *</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="
+                dialog = false;
+                construccion.materiales = [];
+              "
+            >
+              Close
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+    {{ construccion.materiales }}
   </v-app>
 </template>
+ 
 
 <script>
 export default {
   name: "App",
-
   data: () => ({
-    //
+    dialog: false,
+    construccion: {
+      nombre: "",
+      ancho: "",
+      alto: "",
+      materiales: [],
+    },
   }),
 };
 </script>
