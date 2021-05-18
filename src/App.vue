@@ -13,7 +13,7 @@
         </v-col>
         <v-col class="justify-start" cols="12 text-center" sm="4">
           <v-btn
-            @click="dialog = true"
+            @click="abrirModalCrear"
             color="green ligth white--text"
             elevation="2"
             fab
@@ -120,7 +120,7 @@
     >
 
     <v-row justify="center">
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-dialog v-model="modalConstruccion" persistent max-width="550px">
         <v-card>
           <v-card-title>
             <span class="headline">Datos de la construcción</span>
@@ -130,6 +130,7 @@
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
+                    :rules="rules"
                     v-model="construccion.nombre"
                     label="Tipo de construcción*"
                     required
@@ -185,13 +186,13 @@
               color="blue darken-1"
               text
               @click="
-                dialog = false;
+                modalConstruccion = false;
                 construccion.materiales = [];
               "
             >
               Cerrar
             </v-btn>
-            <v-btn color="blue darken-1" text @click="dialog = false">
+            <v-btn color="blue darken-1" text @click="enviarDatos">
               Guardar
             </v-btn>
           </v-card-actions>
@@ -204,6 +205,7 @@
  
 
 <script>
+import Swal from "sweetalert2";
 /* 
   Todo:
   [] *Agregar funcionalidad para crear una construccion
@@ -213,12 +215,14 @@
   [] *Completar CRUD agregando sweetalert & tost mensajes
   [] *Corregir error relacionados a ortiifgrafia consola etc, 
   [] *render condicional en botones y templte
+  [] *Agregar Sweet alert con toast
 
 */
 export default {
   name: "App",
   data: () => ({
-    dialog: false,
+    modalConstruccion: false,
+    esCrear: false,
     construccion: {
       nombre: "",
       ancho: "",
@@ -227,6 +231,34 @@ export default {
     },
     rules: [(value) => !!value || "Debes completar este campo."],
   }),
+  methods: {
+    enviarDatos() {
+      const esValido = this.comprobarDatos(this.construccion);
+      if (!esValido) {
+        const alertaError = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+        });
+
+        return alertaError.fire({
+          icon: "error",
+          title: "Completa todos los campos.",
+        });
+      }
+      console.log(this.construccion)
+      this.modalConstruccion = false;
+    },
+    comprobarDatos({ nombre, ancho, alto, materiales }) {
+      return !nombre || !ancho || !alto || !materiales ? false : true;
+    },
+    abrirModalCrear() {
+      this.esCrear = true;
+      this.modalConstruccion = true;
+    },
+  },
 };
 </script>
 <style scoped>
