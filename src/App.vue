@@ -47,8 +47,10 @@
                 >
                   <td>{{ construccion._id.substring(1, 9) }}...</td>
                   <td>{{ construccion.nombre }}</td>
-                  <td>{{ construccion.ancho }}</td>
-                  <td>{{ construccion.alto }}</td>
+                  <td>
+                    {{ construccion.ancho }} <small>Metros de ancho</small>
+                  </td>
+                  <td>{{ construccion.alto }} <small>Metros de alto</small></td>
                   <td>
                     <span
                       v-for="(material, index) in construccion.materiales"
@@ -86,68 +88,72 @@
       </div>
       <div v-else class="container">
         <v-container>
-          <p class="text-center">NO hay edificaciones registradas</p>
+          <p class="text-center">{{ datosVacios }}</p>
         </v-container>
       </div>
     </v-container>
-
     <v-row justify="center">
       <v-dialog v-model="modalConstruccion" persistent max-width="550px">
         <v-card>
           <v-card-title>
-            <span class="headline">{{ tituloModal }}</span>
+            <span class="headline">{{ tituloFormulario }}</span>
           </v-card-title>
           <v-card-text>
             <v-container>
-              <v-row>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    :rules="validacionCampos"
-                    v-model="construccion.nombre"
-                    label="Tipo de construcción*"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    :rules="validacionCampos"
-                    v-model="construccion.alto"
-                    label="Indique el ancho*"
-                    min="0"
-                    type="number"
-                    hint="el valor expresado sera en metros (m)"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    :rules="validacionCampos"
-                    v-model="construccion.ancho"
-                    label="Indique el alto*"
-                    min="0"
-                    type="number"
-                    hint="el valor expresado sera en metros (m)"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-autocomplete
-                    v-model="construccion.materiales"
-                    :items="[
-                      'Cemento',
-                      'Barro y arcilla',
-                      'Madera',
-                      'Hormigón',
-                      'Ladrillo',
-                      'Vidrio',
-                      'Acero',
-                      'Aluminio',
-                      'Zinc',
-                    ]"
-                    label="Materiales usados*"
-                    multiple
-                  ></v-autocomplete>
-                </v-col>
-              </v-row>
+              <v-form ref="validation">
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      :rules="validacionCampos"
+                      v-model="construccion.nombre"
+                      label="Tipo de construcción*"
+                      required
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      :rules="validacionCampos"
+                      v-model="construccion.alto"
+                      label="Indique el ancho*"
+                      min="0"
+                      type="number"
+                      hint="el valor expresado sera en metros (m)"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      :rules="validacionCampos"
+                      v-model="construccion.ancho"
+                      label="Indique el alto*"
+                      min="0"
+                      type="number"
+                      hint="el valor expresado sera en metros (m)"
+                      required
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" lg="12" xl="12" md="12">
+                    <v-autocomplete
+                      v-model="construccion.materiales"
+                      :items="[
+                        'Cemento',
+                        'Barro y arcilla',
+                        'Madera',
+                        'Hormigón',
+                        'Ladrillo',
+                        'Vidrio',
+                        'Acero',
+                        'Aluminio',
+                        'Zinc',
+                      ]"
+                      label="Materiales usados*"
+                      multiple
+                      placeholder="Selecciona o escribe"
+                      no-data-text="Este material no esta disponible"
+                      chips
+                    ></v-autocomplete>
+                  </v-col>
+                </v-row>
+              </v-form>
             </v-container>
             <small
               >Todos los campos con un * son de caracter obligatorios</small
@@ -172,22 +178,12 @@
 <script>
 import Swal from "sweetalert2";
 import { url } from "@/constante.js";
-/* 
-  Todo:
-  [X] *Agregar funcionalidad para crear una construccion
-  [X] *Agregar Sweet alert con toast
-  [X] *Validar los campo (muestre alerta que todos son requeridos)
-  [X] *Agregar funcionalidad para editar una constrccuin
-  [X] *binding con el autocomplete que se llene los campos al editar
-  [X] *Completar CRUD agregando sweetalert & tost mensajes
-  [X] *render condicional en botones y templte
-  [] *Corregir error relacionados a ortiifgrafia consola etc, 
 
-*/
 export default {
   name: "App",
   data: () => ({
     modalConstruccion: false,
+    datosVacios: "",
     esCrear: false,
     construccion: {
       nombre: "",
@@ -205,7 +201,7 @@ export default {
     textDinamicoBoton() {
       return this.construccion._id ? "Editar" : "Crear";
     },
-    tituloModal() {
+    tituloFormulario() {
       return this.construccion._id
         ? "Datos de la construcción en edición"
         : "Datos de la nueva construcción";
@@ -220,6 +216,7 @@ export default {
             this.construcciones = data;
           } else {
             this.construcciones = [];
+            this.datosVacios = data.mensaje;
           }
         })
         .catch((e) => {
@@ -278,6 +275,7 @@ export default {
         })
         .catch((e) => {
           this.mostrarAlerta(e.message, "error");
+          this.establecerDatos();
         });
     },
     editarConstruccion({ nombre, ancho, alto, materiales, _id }) {
@@ -292,16 +290,17 @@ export default {
         })
         .catch((e) => {
           this.mostrarAlerta(e.message, "error");
+          this.establecerDatos();
         });
     },
     eliminarConstruccion(idConstruccion) {
       Swal.fire({
-        title: "¿Quieres eliminar esta edificación?",
+        title: "¿Quieres eliminar esta construcción?",
         text: "Una vez eliminada, no podras recuperas los datos",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#4caf50",
-        cancelButtonColor: "#2778c4",
+        confirmButtonColor: "#f14545",
+        cancelButtonColor: "#4caf50",
         cancelButtonText: "Cancelar",
         confirmButtonText: "Eliminar",
       }).then((result) => {
@@ -321,6 +320,7 @@ export default {
       });
     },
     establecerDatos() {
+      this.$refs.validation.resetValidation();
       this.construccion = {
         nombre: "",
         ancho: "",
