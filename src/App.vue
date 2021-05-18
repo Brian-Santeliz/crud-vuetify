@@ -173,9 +173,6 @@
         </v-card>
       </v-dialog>
     </v-row>
-    <footer class="footer">
-      <small> {{ year }} &copy; Julio Rodriguez </small>
-    </footer>
   </v-app>
 </template>
  
@@ -357,17 +354,5 @@ export default {
   border-radius: 0.25rem;
   color: #fff;
   background-color: #28a745;
-}
-.footer {
-  font-weight: bold;
-  color: #fff;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  font-size: 1.5em;
-  text-align: center;
-  padding: 5px;
-  background: #338045;
 }
 </style>
