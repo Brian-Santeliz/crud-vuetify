@@ -8,7 +8,7 @@
         <v-col class="justify-end" cols="12 text-center" sm="4">
           <h3>
             Total Construcciones:
-            <span class="count">8</span>
+            <span class="count">{{construcciones.length}}</span>
           </h3>
         </v-col>
         <v-col class="justify-start" cols="12 text-center" sm="4">
@@ -43,7 +43,7 @@
                   v-for="construccion in construcciones"
                   :key="construccion._id"
                 >
-                  <td>{{ construccion._id.substring(1,9) }}...</td>
+                  <td>{{ construccion._id.substring(1, 9) }}...</td>
                   <td>{{ construccion.nombre }}</td>
                   <td>{{ construccion.ancho }}</td>
                   <td>{{ construccion.alto }}</td>
@@ -55,10 +55,19 @@
                     >
                   </td>
                   <td>
-                    <v-btn class="mx-2" fab dark small color="error">
+                    <v-btn
+                      @click="eliminarConstruccion(construccion._id)"
+                      class="mx-2"
+                      fab
+                      dark
+                      small
+                      color="error"
+                    >
                       <v-icon dark> mdi-minus </v-icon>
                     </v-btn>
-                    <v-btn class="mx-2" fab dark small color="teal">
+                    <v-btn 
+                    @click="abrirModalEditar(construccion)"
+                    class="mx-2" fab dark small color="teal">
                       <v-icon dark> mdi-pencil </v-icon>
                     </v-btn>
                   </td>
@@ -143,7 +152,7 @@
               Cerrar
             </v-btn>
             <v-btn color="blue darken-1" text @click="enviarDatos">
-              Guardar
+              {{textDinamicoBoton}}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -183,20 +192,28 @@ export default {
     validacionCampos: [(valor) => !!valor || "Debes completar este campo."],
   }),
   mounted() {
-    this.axios
-      .get(`${url}/obtener`)
-      .then(({ data }) => {
-        if (data.length > 0) {
-          this.construcciones = data;
-        } else {
-          this.construcciones = [];
-        }
-      })
-      .catch((e) => {
-        console.error(e.message);
-      });
+    this.obtenerConstrucciones();
+  },
+  computed:{
+    textDinamicoBoton(){
+      return this.construccion._id ? 'Editar' : 'Crear'
+    }
   },
   methods: {
+    obtenerConstrucciones() {
+      this.axios
+        .get(`${url}/obtener`)
+        .then(({ data }) => {
+          if (data.length > 0) {
+            this.construcciones = data;
+          } else {
+            this.construcciones = [];
+          }
+        })
+        .catch((e) => {
+          console.error(e.message);
+        });
+    },
     mostrarAlerta(title, icon) {
       const alerta = Swal.mixin({
         toast: true,
@@ -218,7 +235,7 @@ export default {
       }
       this.esCrear
         ? this.crearConstruccion(this.construccion)
-        : this.editarConstruccion(this.construcciones);
+        : this.editarConstruccion(this.construccion);
       this.modalConstruccion = false;
     },
     comprobarDatos({ nombre, ancho, alto, materiales }) {
@@ -226,6 +243,11 @@ export default {
     },
     abrirModalCrear() {
       this.esCrear = true;
+      this.modalConstruccion = true;
+    },
+    abrirModalEditar(datos){
+      this.construccion = { ...datos};
+      this.esCrear = false;
       this.modalConstruccion = true;
     },
     cerrarModal() {
@@ -238,11 +260,38 @@ export default {
         .then(({ data: { mensaje }, status }) => {
           if (status === 201) {
             this.mostrarAlerta(mensaje, "success");
+            this.obtenerConstrucciones();
             this.establecerDatos();
           }
         })
         .catch((e) => {
           this.mostrarAlerta(e.message, "error");
+        });
+    },
+    editarConstruccion({nombre, ancho, alto, materiales, _id}){
+      this.axios.put(`${url}/actualizar/${_id}`, {nombre, ancho, alto, materiales})
+        .then(response=>{
+          if(response.status === 200){
+            this.mostrarAlerta(response.data.mensaje, "success");
+            this.obtenerConstrucciones();
+            this.establecerDatos();
+          }
+        })
+        .catch(e=>{
+          this.mostrarAlerta(e.message, "error");
+        })
+    },
+    eliminarConstruccion(idConstruccion) {
+      this.axios
+        .delete(`${url}/eliminar/${idConstruccion}`)
+        .then((response) => {
+          if (response.status === 200) {
+            this.mostrarAlerta(response.data.mensaje, "success");
+            this.obtenerConstrucciones()
+          }
+        })
+        .catch((e) => {
+          this.mostrarAlerta(e.message, "errror");
         });
     },
     establecerDatos() {
