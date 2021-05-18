@@ -137,6 +137,7 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
+                    :rules="rules"
                     v-model="construccion.alto"
                     label="Indique el ancho*"
                     type="number"
@@ -145,6 +146,7 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
+                    :rules="rules"
                     v-model="construccion.ancho"
                     label="Indique el alto*"
                     type="number"
@@ -154,6 +156,7 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-autocomplete
+                    :rules="rules"
                     v-model="construccion.materiales"
                     :items="[
                       'Cemento',
@@ -186,10 +189,10 @@
                 construccion.materiales = [];
               "
             >
-              Close
+              Cerrar
             </v-btn>
             <v-btn color="blue darken-1" text @click="dialog = false">
-              Save
+              Guardar
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -201,6 +204,17 @@
  
 
 <script>
+/* 
+  Todo:
+  [] *Agregar funcionalidad para crear una construccion
+  [] *Agregar funcionalidad para editar una constrccuin
+  [] *Validar los campo (muestre alerta que todos son requeridos)
+  [] *binding con el autocomplete que se llene los campos al editar
+  [] *Completar CRUD agregando sweetalert & tost mensajes
+  [] *Corregir error relacionados a ortiifgrafia consola etc, 
+  [] *render condicional en botones y templte
+
+*/
 export default {
   name: "App",
   data: () => ({
@@ -211,6 +225,7 @@ export default {
       alto: "",
       materiales: [],
     },
+    rules: [(value) => !!value || "Debes completar este campo."],
   }),
 };
 </script>
