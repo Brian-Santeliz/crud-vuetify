@@ -149,7 +149,7 @@
                       label="Materiales usados*"
                       multiple
                       placeholder="Selecciona o escribe"
-                      no-data-text="Este material no esta disponible"
+                      no-data-text="Este material no esta disponible."
                       chips
                       :allow-overflow="false"
                     ></v-autocomplete>
@@ -179,7 +179,7 @@
 
 <script>
 import Swal from "sweetalert2";
-import { url } from "@/constante.js";
+import { url } from "@/urlBackend.js";
 
 export default {
   name: "App",
